@@ -197,4 +197,12 @@ setcolorder(parms_biomass, c("species_code", "label", "model.ver", "model.DorH",
 setnames(parms_biomass, "model.DorH", "model.DorDH")
 usethis::use_data(parms_biomass, overwrite = TRUE)
 usethis::use_data(species_list_biomass, overwrite = TRUE)
+names(spc.ref)
 
+# add MRNQ_CODE in species list
+str(spc.ref)
+data(species_list_biomass)
+setDT(spc.ref)[, species_code:=paste0(substr(NFI_CODE,1,4), substr(NFI_CODE,6,8))]
+spc.ref[!is.na((MRNQ_CODE)), .N, by = .(species_code)][N>1]
+species_list_biomass<- merge(species_list_biomass, spc.ref[!is.na(MRNQ_CODE),c("species_code", "MRNQ_CODE")], by = "species_code", all.x = T)
+usethis::use_data(species_list_biomass, overwrite = TRUE)

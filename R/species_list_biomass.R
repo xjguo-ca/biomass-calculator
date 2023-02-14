@@ -6,6 +6,7 @@
 #' \item{ENGLISH_NAME}{english name}
 #' \item{FRENCH_NAME}{french name}
 #' \item{SCIENTIFIC_NAME}{scientific name}
+#' \item{MRNQ_CODE}{species code used by MRNQ}
 #' }
 #'
 "species_list_biomass"
