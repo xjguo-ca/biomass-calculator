@@ -1,6 +1,6 @@
-#' above ground biomass calculation
+#' Canadian national tree aboveground biomass equations
 
-#' @description above ground biomass calculation using Ung2008 and Lambert2005
+#' @description above ground tree biomass calculation using Ung2008 and Lambert2005
 
 #' @details For both Ung2008 and Lambert2005, We have developed D-model and DH-model depending on the availability of total height.
 #' If species_code was missing or doesn't exist in the parameter sets of the models, use one of the species group ("ALL", "SOFTWOOD", "HARDWOOD") for the approx. estimation.
@@ -8,9 +8,9 @@
 
 #' @param data a data frame that includes at minimum the columns: species_code, dbh_cm, Htot_m(if using DH-model). unit of dbh_cm in centimeter and Htot_m in meter to have the estimated biomass in kg.
 #' @param model.Ver parameter sets from 2 publications, values: "Ung2008" (default), "Lambert2005"
-#' @param model.D logi, T: D-model(default), F: DH-model
+#' @param model.D logi, TRUE: D-model(default), FALSE: DH-model
 #'
-#' @returns Above ground biomass (in Kg) of 4 compartments (wood, bark, branches, foliage) and tree biomass
+#' @returns Above ground biomass (in kg) of 4 compartments (wood, bark, branches, foliage) and tree biomass
 #' as the sum of the 4 compartments.
 #'
 #' @import stringr
@@ -48,10 +48,10 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE){
   if (length(spc.na1) > 0) stop(paste0("no parameters for '",  spc.na1 , "', please verify species_code or use 'ALL'/'SOFTWOOD'/'HARDWOOD' for the approx. estimation instead"))
   if (spc.na2 >0) warnings("missing species_code, biomass won't be estimated")
   # check dbh
-  if (!("dbh_cm" %in% names(data))) stop("dbh_cm is missing, please verify input data...")
-  if (!is.numeric(data$dbh_cm)) stop("dbh_cm must be numeric, please verify input data...")
-  if ( nrow(data[dbh_cm <= 0 | is.na(dbh_cm)]) > 0 ) stop("dbh_cm must have values and positive")
-  if (model.D==T) {
+  if (!("dbh_cm" %in% names(data))) stop("'dbh_cm' is missing, please verify input data...")
+  if (!is.numeric(data$dbh_cm)) stop("'dbh_cm' must be numeric, please verify input data...")
+  if ( nrow(data[dbh_cm <= 0 | is.na(dbh_cm)]) > 0 ) stop("'dbh_cm' must have values and positive")
+  if (model.D==TRUE) {
     while ("Htot_m" %in% names(data)) {
 
       H.tmp <- paste0("Htot_m",sample.int(100,1))
@@ -61,9 +61,9 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE){
 
   } else{
     # check Htot
-    if (!("Htot_m" %in% names(data))) stop("Htot_m is missing, please verify input data...")
-    if (!is.numeric(data$Htot_m)) stop("Htot_m must be numeric, please verify input data...")
-    if ( nrow(data[Htot_m <= 0 | is.na(Htot_m)]) > 0 ) stop("Htot_m must have values and positive")
+    if (!("Htot_m" %in% names(data))) stop("column 'Htot_m' is missing, please verify input data...")
+    if (!is.numeric(data$Htot_m)) stop("'Htot_m' must be numeric, please verify input data...")
+    if ( nrow(data[Htot_m <= 0 | is.na(Htot_m)]) > 0 ) stop("'Htot_m' must have values and positive")
   }
   mass <- merge(data, parms.sel, by = "species_code", all.x = T)
 
