@@ -34,8 +34,9 @@
 #' @references Lambert, M.-C.; Ung, C.-H.; Raulier, F. 2005. Canadian national tree aboveground biomass equations. Can. J. For. Res. 35:1996-2018.
 #' @references Ung, C.-H.; Bernier, P.; Guo, X.-J. 2008. Canadian national biomass equations: new parameter estimates that include British Columbia data. Can. J. For. Res 38:1123-2232.
 
-calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE){
+calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE) {
   BM_Tree_kg <- BM_bark_kg <- BM_branch_kg <- BM_fol_kg <- BM_wood_kg <- N <- ord <- NULL
+  H.tmp <- ord.tmp <- NULL
   # parameter set selection
   if (!(tolower(model.Ver) %in% c("ung2008", "lambert2005"))) stop("please check model.ver,it can only take one of the 2 values: 'Ung2008' or 'Lambert2005'")
   parms_biomass <- data.table::data.table(parms_biomass)
@@ -71,7 +72,7 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE){
     ord.tmp <- paste0("ord",sample.int(100,1))
     if (!(ord.tmp %in% names(data))) setnames(data, "ord", ord.tmp)
   }
-  data$ord <- sequence(nrow(data()))
+  data$ord <- sequence(nrow(data))
   mass <- merge(data, parms.sel, by = "species_code", all.x = T)
 
   mass[, c("BM_wood_kg", "BM_bark_kg", "BM_branch_kg","BM_fol_kg") := list(
@@ -86,14 +87,14 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE){
   if (model.D == T) {
     mass[,Htot_m := NULL]
     data[,Htot_m := NULL]
-    if (exists("H.tmp")) {
+    if (exists("H.tmp") & !is.null(H.tmp)) {
       setnames(mass, H.tmp, "Htot_m")
       setnames(data, H.tmp, "Htot_m")}
   }
   # ord.tmp doesn't exist,which mean ord not a column in the data
-  if (!exists("ord.tmp")){
   data[, ord:=NULL]
-  mass[, ord:=NULL]}else{
+  mass[, ord:=NULL]
+  if (exists("ord.tmp") & !is.null(ord.tmp)){
     setnames(mass, ord.tmp, "ord")
     setnames(data, ord.tmp, "ord")
 }
@@ -101,7 +102,6 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE){
   mass
 }
 
-# abvG<- calbiomass(data = sample_data, model.Ver = "Ung2008", model.D = T)
 
 
 

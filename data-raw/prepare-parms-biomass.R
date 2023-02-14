@@ -1,21 +1,6 @@
 ## code to prepare `parms.biomass` dataset goes here
 
-# source file of parameters
-# parms <- haven::read_sas('P:/Jing 2/Pare/Reftables/SAS/parms.sas7bdat')
-# equ_lambert <- haven::read_sas('P:/Jing 2/Pare/Reftables/SAS/equ_lambert.sas7bdat')
-#
-# setDT(parms)
-# setDT(equ_lambert)
-# names(parms)
-#
-# setnames(parms, "Equbiomass",  "equ")
-# parmsD.lambert <-parms[,c("species", "NFI_CODE", "MRNQ_CODE")][equ_lambert, on = .(species)]
-# # save(parmsD.lambert, file =  "P:/Jing/2010-08/Demand/2022/1213 Francis/parmsD.lambert.Rdata")
-#
-#
-# load("P:/Jing/2010-08/Demand/2022/1213 Francis/parmsD.lambert.rdata")
-# # use All to calculate the mass that the species was not in the parameter list
-# parmsD.lambert[species=="All", MRNQ_CODE := "A"]
+
 
 library(data.table)
 
@@ -213,4 +198,3 @@ setnames(parms_biomass, "model.DorH", "model.DorDH")
 usethis::use_data(parms_biomass, overwrite = TRUE)
 usethis::use_data(species_list_biomass, overwrite = TRUE)
 
-usethis::use_data(parms.biomass, overwrite = TRUE)
