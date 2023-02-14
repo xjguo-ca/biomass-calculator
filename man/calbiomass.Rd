@@ -2,7 +2,7 @@
 % Please edit documentation in R/calBiomass.R
 \name{calbiomass}
 \alias{calbiomass}
-\title{above ground biomass calculation}
+\title{Canadian national tree aboveground biomass equations}
 \usage{
 calbiomass(data, model.Ver = "Ung2008", model.D = TRUE)
 }
@@ -11,18 +11,18 @@ calbiomass(data, model.Ver = "Ung2008", model.D = TRUE)
 
 \item{model.Ver}{parameter sets from 2 publications, values: "Ung2008" (default), "Lambert2005"}
 
-\item{model.D}{logi, T: D-model(default), F: DH-model}
+\item{model.D}{logi, TRUE: D-model(default), FALSE: DH-model}
 }
 \value{
-Above ground biomass (in Kg) of 4 compartments (wood, bark, branches, foliage) and tree biomass
+Above ground biomass (in kg) of 4 compartments (wood, bark, branches, foliage) and tree biomass
 as the sum of the 4 compartments.
 }
 \description{
-above ground biomass calculation using Ung2008 and Lambert2005
+above ground tree biomass calculation using Ung2008 and Lambert2005
 }
 \details{
 For both Ung2008 and Lambert2005, We have developed D-model and DH-model depending on the availability of total height.
-species_code cannot be empty, use one of the species group ("ALL", "SOFTWOOD", "HARDWOOD") for the approx. estimation.
+If species_code was missing or doesn't exist in the parameter sets of the models, use one of the species group ("ALL", "SOFTWOOD", "HARDWOOD") for the approx. estimation.
 }
 \examples{
 sample_data <- data.table::data.table(
