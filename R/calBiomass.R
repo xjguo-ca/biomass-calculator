@@ -45,7 +45,7 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE){
   # check species_code
   spc.na1 <- setdiff(data$species_code, parms.sel$species_code)
   spc.na2 <- nrow(data[species_code == "" | is.na(species_code)])
-  if (length(spc.na1) > 0) stop(paste0("no parameters for '",  spc.na1 , "', please verify species_code or use 'ALL'/'SOFT'/'HARD' for the approx. estimation instead"))
+  if (length(spc.na1) > 0) stop(paste0("no parameters for '",  spc.na1 , "', please verify species_code or use 'ALL'/'SOFTWOOD'/'HARDWOOD' for the approx. estimation instead"))
   if (spc.na2 >0) warnings("missing species_code, biomass won't be estimated")
   # check dbh
   if (!("dbh_cm" %in% names(data))) stop("dbh_cm is missing, please verify input data...")
