@@ -3,7 +3,7 @@
 #' @description above ground biomass calculation using Ung2008 and Lambert2005
 
 #' @details For both Ung2008 and Lambert2005, We have developed D-model and DH-model depending on the availability of total height.
-#' species_code cannot be empty, use one of the species group ("ALL", "SOFTWOOD", "HARDWOOD") for the approx. estimation.
+#' If species_code was missing or doesn't exist in the parameter sets of the models, use one of the species group ("ALL", "SOFTWOOD", "HARDWOOD") for the approx. estimation.
 #'
 
 #' @param data a data frame that includes at minimum the columns: species_code, dbh_cm, Htot_m(if using DH-model). unit of dbh_cm in centimeter and Htot_m in meter to have the estimated biomass in kg.
@@ -45,7 +45,7 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE){
   # check species_code
   spc.na1 <- setdiff(data$species_code, parms.sel$species_code)
   spc.na2 <- nrow(data[species_code == "" | is.na(species_code)])
-  if (length(spc.na1) > 0) stop(paste0("no parameters for ",  spc.na1 , ", please verify species_code or use 'ALL'/'SOFT'/'HARD' for the approx. estimation instead"))
+  if (length(spc.na1) > 0) stop(paste0("no parameters for '",  spc.na1 , "', please verify species_code or use 'ALL'/'SOFT'/'HARD' for the approx. estimation instead"))
   if (spc.na2 >0) warnings("missing species_code, biomass won't be estimated")
   # check dbh
   if (!("dbh_cm" %in% names(data))) stop("dbh_cm is missing, please verify input data...")
