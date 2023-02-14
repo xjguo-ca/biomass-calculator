@@ -65,11 +65,19 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE){
     if (!is.numeric(data$Htot_m)) stop("'Htot_m' must be numeric, please verify input data...")
     if ( nrow(data[Htot_m <= 0 | is.na(Htot_m)]) > 0 ) stop("'Htot_m' must have values and positive")
   }
+  # to keep the original order
+  while ("ord" %in% names(data)) {
+
+    ord.tmp <- paste0("ord",sample.int(100,1))
+    if (!(ord.tmp %in% names(data))) setnames(data, "ord", ord.tmp)
+  }
+  data$ord <- sequence(nrow(data()))
   mass <- merge(data, parms.sel, by = "species_code", all.x = T)
 
   mass[, c("BM_wood_kg", "BM_bark_kg", "BM_branch_kg","BM_fol_kg") := list(
     bwood1*dbh_cm^bwood2*Htot_m^bwood3, bbark1*dbh_cm^bbark2*Htot_m^bbark3,
     bbranches1*dbh_cm^bbranches2*Htot_m^bbranches3,bfoliage1*dbh_cm^bfoliage2*Htot_m^bfoliage3)]
+  setorder(mass, ord)
 
 
   # /*kg/tree*/
@@ -82,6 +90,13 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE){
       setnames(mass, H.tmp, "Htot_m")
       setnames(data, H.tmp, "Htot_m")}
   }
+  if (ord.tmp %in% names(mass)) {
+    setnames(mass, ord.tmp, "ord")
+    setnames(data, ord.tmp, "ord")}
+}else{
+  data[, ord:=NULL]
+  mass[, ord:=NULL]
+}
   mass
 }
 
