@@ -14,5 +14,6 @@ Depends:
 LazyData: true
 Imports: 
     data.table,
-    stringr
+    stringr,
+    plyr
 

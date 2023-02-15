@@ -2,4 +2,5 @@
 
 export(calbiomass)
 import(data.table)
+import(plyr)
 import(stringr)

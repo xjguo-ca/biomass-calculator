@@ -15,6 +15,7 @@
 #'
 #' @import stringr
 #' @import data.table
+#' @import plyr
 #'
 
 #' @export
@@ -36,11 +37,11 @@
 
 calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE) {
   BM_Tree_kg <- BM_bark_kg <- BM_branch_kg <- BM_fol_kg <- BM_wood_kg <- N <- ord <- NULL
-  H.tmp <- ord.tmp <- NULL
-  # parameter set selection
+
+    # parameter set selection
   if (!(tolower(model.Ver) %in% c("ung2008", "lambert2005"))) stop("please check model.ver,it can only take one of the 2 values: 'Ung2008' or 'Lambert2005'")
-  parms_biomass <- data.table::data.table(parms_biomass)
-  parms.sel <- parms_biomass[str_detect(model.ver,toupper(substr(model.Ver,1,1)))][str_detect(model.DorDH, "H") != model.D]
+
+  parms.sel <- biomass::parms_biomass[str_detect(model.ver,toupper(substr(model.Ver,1,1)))][str_detect(model.DorDH, "H") != model.D]
   if (nrow(parms.sel) == 0 | nrow(parms.sel[, .N, by = .(species_code)][N!=1]) >0) stop("check the input model.Ver and/or model.D")
 
   # check species_code
@@ -52,52 +53,34 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE) {
   if (!("dbh_cm" %in% names(data))) stop("'dbh_cm' is missing, please verify input data...")
   if (!is.numeric(data$dbh_cm)) stop("'dbh_cm' must be numeric, please verify input data...")
   if ( nrow(data[dbh_cm <= 0 | is.na(dbh_cm)]) > 0 ) stop("'dbh_cm' must have values and positive")
-  if (model.D==TRUE) {
-    while ("Htot_m" %in% names(data)) {
 
-      H.tmp <- paste0("Htot_m",sample.int(100,1))
-      if (!(H.tmp %in% names(data))) setnames(data, "Htot_m", H.tmp)
-    }
-    data[,Htot_m:= 1]
 
-  } else{
+  if (model.D==FALSE){
+
     # check Htot
-    if (!("Htot_m" %in% names(data))) stop("column 'Htot_m' is missing, please verify input data...")
-    if (!is.numeric(data$Htot_m)) stop("'Htot_m' must be numeric, please verify input data...")
-    if ( nrow(data[Htot_m <= 0 | is.na(Htot_m)]) > 0 ) stop("'Htot_m' must have values and positive")
+    if (!("Htot_m" %in% names( data))) stop("column 'Htot_m' is missing, please verify input dt.input...")
+    if (!is.numeric( data$Htot_m)) stop("'Htot_m' must be numeric, please verify input data...")
+    if ( nrow( data[Htot_m <= 0 | is.na(Htot_m)]) > 0 ) stop("'Htot_m' must have values and positive")
   }
   # to keep the original order
-  while ("ord" %in% names(data)) {
 
-    ord.tmp <- paste0("ord",sample.int(100,1))
-    if (!(ord.tmp %in% names(data))) setnames(data, "ord", ord.tmp)
-  }
-  data$ord <- sequence(nrow(data))
-  mass <- merge(data, parms.sel, by = "species_code", all.x = T)
+  mass <- join(data, parms.sel, by = "species_code")
 
+  setDT(mass)
+  if (model.D == TRUE)
   mass[, c("BM_wood_kg", "BM_bark_kg", "BM_branch_kg","BM_fol_kg") := list(
-    bwood1*dbh_cm^bwood2*Htot_m^bwood3, bbark1*dbh_cm^bbark2*Htot_m^bbark3,
-    bbranches1*dbh_cm^bbranches2*Htot_m^bbranches3,bfoliage1*dbh_cm^bfoliage2*Htot_m^bfoliage3)]
-  setorder(mass, ord)
+    bwood1*dbh_cm^bwood2, bbark1*dbh_cm^bbark2,
+    bbranches1*dbh_cm^bbranches2,bfoliage1*dbh_cm^bfoliage2)]
+   else
+     mass[, c("BM_wood_kg", "BM_bark_kg", "BM_branch_kg","BM_fol_kg") := list(
+       bwood1*dbh_cm^bwood2*Htot_m^bwood3, bbark1*dbh_cm^bbark2*Htot_m^bbark3,
+       bbranches1*dbh_cm^bbranches2*Htot_m^bbranches3,bfoliage1*dbh_cm^bfoliage2*Htot_m^bfoliage3)]
 
 
   # /*kg/tree*/
   mass[,BM_Tree_kg := BM_wood_kg + BM_bark_kg + BM_branch_kg + BM_fol_kg]
   mass <- mass[,-(setdiff(names(parms.sel), "species_code")), with = F]
-  if (model.D == T) {
-    mass[,Htot_m := NULL]
-    data[,Htot_m := NULL]
-    if (exists("H.tmp") & !is.null(H.tmp)) {
-      setnames(mass, H.tmp, "Htot_m")
-      setnames(data, H.tmp, "Htot_m")}
-  }
-  # ord.tmp doesn't exist,which mean ord not a column in the data
-  data[, ord:=NULL]
-  mass[, ord:=NULL]
-  if (exists("ord.tmp") & !is.null(ord.tmp)){
-    setnames(mass, ord.tmp, "ord")
-    setnames(data, ord.tmp, "ord")
-}
+
 
   mass
 }
