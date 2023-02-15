@@ -41,6 +41,7 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE) {
     # parameter set selection
   if (!(tolower(model.Ver) %in% c("ung2008", "lambert2005"))) stop("please check model.ver,it can only take one of the 2 values: 'Ung2008' or 'Lambert2005'")
 
+  # https://coolbutuseless.github.io/2018/12/10/r-packages-internal-and-external-data/
   parms.sel <- biomass::parms_biomass[str_detect(model.ver,toupper(substr(model.Ver,1,1)))][str_detect(model.DorDH, "H") != model.D]
   if (nrow(parms.sel) == 0 | nrow(parms.sel[, .N, by = .(species_code)][N!=1]) >0) stop("check the input model.Ver and/or model.D")
 
@@ -49,7 +50,8 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE) {
   spc.na2 <- nrow(data[species_code == "" | is.na(species_code)])
   if (length(spc.na1) > 0) stop(paste0("no parameters for '",  spc.na1 , "', please verify species_code or use 'ALL'/'SOFTWOOD'/'HARDWOOD' for the approx. estimation instead"))
   if (spc.na2 >0) warnings("missing species_code, biomass won't be estimated")
-  # check dbh
+
+   # check dbh
   if (!("dbh_cm" %in% names(data))) stop("'dbh_cm' is missing, please verify input data...")
   if (!is.numeric(data$dbh_cm)) stop("'dbh_cm' must be numeric, please verify input data...")
   if ( nrow(data[dbh_cm <= 0 | is.na(dbh_cm)]) > 0 ) stop("'dbh_cm' must have values and positive")
@@ -58,11 +60,12 @@ calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE) {
   if (model.D==FALSE){
 
     # check Htot
-    if (!("Htot_m" %in% names( data))) stop("column 'Htot_m' is missing, please verify input dt.input...")
+    if (!("Htot_m" %in% names( data))) stop("column 'Htot_m' is missing in DH-model, please verify input data...")
     if (!is.numeric( data$Htot_m)) stop("'Htot_m' must be numeric, please verify input data...")
     if ( nrow( data[Htot_m <= 0 | is.na(Htot_m)]) > 0 ) stop("'Htot_m' must have values and positive")
   }
-  # to keep the original order
+
+  # use plyr::join to keep the order of data
 
   mass <- join(data, parms.sel, by = "species_code")
 
