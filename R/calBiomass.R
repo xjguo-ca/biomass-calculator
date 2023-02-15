@@ -36,7 +36,7 @@
 #' @references Ung, C.-H.; Bernier, P.; Guo, X.-J. 2008. Canadian national biomass equations: new parameter estimates that include British Columbia data. Can. J. For. Res 38:1123-2232.
 
 calbiomass <- function(data , model.Ver = "Ung2008", model.D = TRUE) {
-  BM_Tree_kg <- BM_bark_kg <- BM_branch_kg <- BM_fol_kg <- BM_wood_kg <- N <- ord <- NULL
+  BM_Tree_kg <- BM_bark_kg <- BM_branch_kg <- BM_fol_kg <- BM_wood_kg <- N <- NULL
 
     # parameter set selection
   if (!(tolower(model.Ver) %in% c("ung2008", "lambert2005"))) stop("please check model.ver,it can only take one of the 2 values: 'Ung2008' or 'Lambert2005'")
